@@ -9,7 +9,7 @@ st.set_page_config(page_title="QUO DOFA PONDERADA", layout="wide")
 
 # --- CABECERA ---
 try:
-    image = Image.open('logo_quo.png')
+    image = Image.open('LOGO.png')
     st.image(image, width=250)
 except:
     st.info("Logo QUO")
