@@ -90,8 +90,14 @@ if st.button("🚀 CONSTRUIR MAPA ESTRATÉGICO"):
 
         st.pyplot(fig)
 
-        # --- GENERACIÓN DE EXCEL ---
+        # --- GENERACIÓN DE EXCEL MEJORADA ---
         output = io.BytesIO()
+        
+        # Guardar la figura del gráfico en memoria para insertarla en el Excel
+        img_data = io.BytesIO()
+        fig.savefig(img_data, format='png', bbox_inches='tight', dpi=100)
+        img_data.seek(0)
+
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             # Pestaña MATRIZ
             df_final = pd.concat([
@@ -102,9 +108,16 @@ if st.button("🚀 CONSTRUIR MAPA ESTRATÉGICO"):
             ])
             df_final.to_excel(writer, sheet_name='MATRIZ', index=False)
             
-            # Pestaña MAPA (Datos de coordenadas)
+            # Pestaña MAPA
             df_mapa = pd.DataFrame({'Eje': ['Externo (X)', 'Interno (Y)'], 'Valor': [coord_x, coord_y]})
             df_mapa.to_excel(writer, sheet_name='MAPA', index=False)
+            
+            # ACCEDER AL OBJETO WORKBOOK Y WORKSHEET PARA PEGAR LA IMAGEN
+            workbook  = writer.book
+            worksheet = writer.sheets['MAPA']
+            
+            # Insertar la imagen del gráfico debajo de las coordenadas (fila 5)
+            worksheet.insert_image('A5', 'mapa_dofa.png', {'image_data': img_data})
             
         st.download_button(
             label="📥 Descargar Reporte Excel",
